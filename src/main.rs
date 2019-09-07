@@ -1,7 +1,6 @@
+mod question_2;
+
 use std::env;
-use std::fs::File;
-use std::path::Path;
-use regex::Regex;
 
 fn main() {
     let file = if env::args().count() == 2 {
@@ -10,20 +9,5 @@ fn main() {
         panic!("Please enter a file")
     };
 
-    let im = image::open(&Path::new(&file)).unwrap();
-
-    let mut imgbuf = im.to_rgba();
-
-    for (_, _, pixel) in imgbuf.enumerate_pixels_mut() {
-        let tmp = pixel[2];
-        pixel[2] = pixel[0];
-        pixel[0] = tmp;
-    }
-
-    let re = Regex::new(r"\.jpg").unwrap();
-    let out_filename = format!("{}.png", re.replace_all(&file, ""));
-
-    let fout = &mut File::create(&Path::new(&out_filename)).unwrap();
-    image::ImageRgba8(imgbuf).write_to(fout, image::PNG).unwrap();
-
+    question_2::answer(&file);
 }
