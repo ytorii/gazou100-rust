@@ -1,18 +1,23 @@
 use regex::Regex;
-use std::fs::File;
 use std::path::Path;
+
+use image::GenericImageView;
 
 pub fn answer(file: &str) {
     let im = image::open(&Path::new(&file)).unwrap();
-    let imgbuf = im.to_luma();
+    let mut gray_imgbuf = image::GrayImage::new(im.width(), im.height());
+
+    gray_imgbuf
+        .enumerate_pixels_mut()
+        .for_each(|(x, y, pixel)| {
+            let rgb = im.get_pixel(x, y);
+            pixel[0] = (0.2126 * (rgb[0] as f32)
+                + 0.7152 * (rgb[1] as f32)
+                + 0.0722 * (rgb[2] as f32)) as u8;
+        });
 
     let re = Regex::new(r"\.jpg").unwrap();
-    let out_filename = format!("{}_gray.png", re.replace_all(&file, ""));
+    let out_filename = format!("{}_gray.jpg", re.replace_all(&file, ""));
 
-    let fout = &mut File::create(&Path::new(&out_filename)).unwrap();
-
-    // TODO: ここもグレースケールにする
-    image::ImageLuma8(imgbuf)
-        .write_to(fout, image::PNG)
-        .unwrap();
+    gray_imgbuf.save(Path::new(&out_filename)).unwrap();
 }
