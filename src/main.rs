@@ -1,6 +1,9 @@
+extern crate regex;
+
 use std::env;
 use std::fs::File;
 use std::path::Path;
+use regex::Regex;
 
 fn main() {
     let file = if env::args().count() == 2 {
@@ -14,12 +17,13 @@ fn main() {
     let mut imgbuf = im.to_rgba();
 
     for (_, _, pixel) in imgbuf.enumerate_pixels_mut() {
-        let mut res_pixel = pixel.clone();
-        res_pixel[2] = res_pixel[0];
-        *pixel = res_pixel;
+        pixel[2] = pixel[0];
     }
 
-    let fout = &mut File::create(&Path::new(&format!("{}.png", file))).unwrap();
+    let re = Regex::new(r"\.jpg").unwrap();
+    let out_filename = format!("{}.png", re.replace_all(&file, ""));
+
+    let fout = &mut File::create(&Path::new(&out_filename)).unwrap();
     image::ImageRgba8(imgbuf).write_to(fout, image::PNG).unwrap();
 
 }
