@@ -1,5 +1,3 @@
-extern crate regex;
-
 use std::env;
 use std::fs::File;
 use std::path::Path;
@@ -17,7 +15,9 @@ fn main() {
     let mut imgbuf = im.to_rgba();
 
     for (_, _, pixel) in imgbuf.enumerate_pixels_mut() {
+        let tmp = pixel[2];
         pixel[2] = pixel[0];
+        pixel[0] = tmp;
     }
 
     let re = Regex::new(r"\.jpg").unwrap();
