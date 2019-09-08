@@ -1,23 +1,13 @@
-use regex::Regex;
-use std::path::Path;
+use image::{DynamicImage, GenericImageView, GrayImage, ImageBuffer};
 
-use image::{GenericImageView, GrayImage};
-
-pub fn answer(file: &str) {
-    let im = image::open(&Path::new(&file)).unwrap();
-
-    let gray_imgbuf = im.to_rgb().enumerate_pixels().fold(
+pub fn answer(im: &DynamicImage) -> ImageBuffer<image::Luma<u8>, Vec<u8>> {
+    im.to_rgb().enumerate_pixels().fold(
         GrayImage::new(im.width(), im.height()),
         |mut res, (x, y, pixel)| {
             res.put_pixel(x, y, binary_pixel_of(pixel));
             res
         },
-    );
-
-    let re = Regex::new(r"\.jpg").unwrap();
-    let out_filename = format!("{}", re.replace_all(&file, "_binary.jpg"));
-
-    gray_imgbuf.save(Path::new(&out_filename)).unwrap();
+    )
 }
 
 fn binary_pixel_of(rgb_pixel: &image::Rgb<u8>) -> image::Luma<u8> {

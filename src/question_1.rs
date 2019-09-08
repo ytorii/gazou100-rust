@@ -1,20 +1,12 @@
-use std::fs::File;
-use regex::Regex;
-use std::path::Path;
+use image::{DynamicImage, ImageBuffer};
 
-pub fn answer(file: &str) {
-    let im = image::open(&Path::new(&file)).unwrap();
-    let mut imgbuf = im.to_rgba();
+pub fn answer(im: &DynamicImage) -> ImageBuffer<image::Rgb<u8>, Vec<u8>> {
+    let mut imgbuf = im.to_rgb();
 
     imgbuf.pixels_mut().for_each(|pixel| {
-        let image::Rgba(p) = pixel;
+        let image::Rgb(p) = pixel;
         p.swap(0, 2);
     });
 
-    let re = Regex::new(r"\.jpg").unwrap();
-    let out_filename = format!("{}.png", re.replace_all(&file, ""));
-
-    let fout = &mut File::create(&Path::new(&out_filename)).unwrap();
-    image::ImageRgba8(imgbuf).write_to(fout, image::PNG).unwrap();
-
+    imgbuf
 }

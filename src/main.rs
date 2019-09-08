@@ -1,13 +1,19 @@
-mod question_3;
+mod question_2;
 
+use question_2::answer;
 use std::env;
+use std::path::Path;
 
 fn main() {
-    let file = if env::args().count() == 2 {
-        env::args().nth(1).unwrap()
+    let (input_filename, output_filename) = if env::args().count() == 3 {
+        (env::args().nth(1).unwrap(), env::args().nth(2).unwrap())
     } else {
-        panic!("Please enter a file")
+        panic!("Usage: cargo run <input filename> <output filename>")
     };
 
-    question_3::answer(&file);
+    let im = image::open(&Path::new(&input_filename)).unwrap();
+
+    let result_imgbuf = answer(&im);
+
+    result_imgbuf.save(Path::new(&output_filename)).unwrap();
 }
