@@ -1,4 +1,4 @@
-mod question_2;
+mod question_3;
 
 use std::env;
 
@@ -9,5 +9,5 @@ fn main() {
         panic!("Please enter a file")
     };
 
-    question_2::answer(&file);
+    question_3::answer(&file);
 }
