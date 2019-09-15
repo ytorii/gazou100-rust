@@ -1,6 +1,6 @@
-mod question_6;
+mod question_7;
 
-use question_6::answer;
+use question_7::answer;
 use std::env;
 use std::path::Path;
 
