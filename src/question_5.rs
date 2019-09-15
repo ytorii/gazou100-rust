@@ -1,27 +1,14 @@
-use image::{DynamicImage, GenericImageView, ImageBuffer, Rgb, RgbImage};
+use image::{DynamicImage, ImageBuffer, Rgb};
 
 pub fn answer(im: &DynamicImage) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
-    let image_buf = im.to_rgb();
+    let mut image_buf = im.to_rgb();
 
-    let hsvs = rgb_to_hsvs(&image_buf);
-    hsv_to_inverted_rgb(hsvs, im.width(), im.height())
-}
-
-fn rgb_to_hsvs(buf: &ImageBuffer<Rgb<u8>, Vec<u8>>) -> Vec<Hsv> {
-    buf.pixels().fold(vec![], |mut acc, rgb_pixel| {
+    image_buf.pixels_mut().for_each(|rgb_pixel| {
         let hsv = Hsv::from_rgb(rgb_pixel);
-        acc.push(hsv);
-        acc
-    })
-}
+        *rgb_pixel = hsv.invert().to_rgb();
+    });
 
-fn hsv_to_inverted_rgb(hsvs: Vec<Hsv>, width: u32, height: u32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
-    hsvs.iter()
-        .enumerate()
-        .fold(RgbImage::new(width, height), |mut res, (i, hsv)| {
-            res.put_pixel(i as u32 % width, i as u32 / width, hsv.invert().to_rgb());
-            res
-        })
+    image_buf
 }
 
 struct Hsv {
@@ -31,7 +18,7 @@ struct Hsv {
 }
 
 impl Hsv {
-    pub fn from_rgb(rgb_pixel: &Rgb<u8>) -> Hsv {
+    fn from_rgb(rgb_pixel: &Rgb<u8>) -> Hsv {
         let Rgb(rgb) = rgb_pixel;
 
         let (max, min) = (rgb.iter().max().unwrap(), rgb.iter().min().unwrap());
